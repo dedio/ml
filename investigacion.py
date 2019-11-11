@@ -46,7 +46,7 @@ if __name__ == "__main__":
             # Por cada user_id ingresado en la línea de comandos
             # geneara un log con los datos solicitados
             for value in values:
-                with open(('user_id_' + str(value) + '.log'), '') as log:
+                with open(('user_id_' + str(value) + '.log'), 'w') as log:
                     # Recorre los items de la consulta
                     for item in consulta(str(value)):
                         log.writelines(item["body"]["id"] + ' ' + item["body"]["title"] + ' ' + item["body"]["category_id"] + ' ' + item["body"]["name"])
