@@ -28,13 +28,19 @@ import requests
 import json
 
 # Retorna un request tipo get de la API
-def consulta(self, user_id):
-    return json.loads(requests.get((ROOT + user_id + TOKEN)).text)
+# el parámetro flag es para cambiar la consulta entre user_id o category_id 
+def consulta(object_id, flag = True):
+    if flag:
+        url = ROOT
+    else:
+        url = CAT
+    return json.loads(requests.get((url + str(object_id) + TOKEN)).text)
 
 if __name__ == "__main__":
     
     TOKEN = '&access_token='
     ROOT = 'https://api.mercadolibre.com/sites/MLA/search?seller_id='
+    CAT = 'https://api.mercadolibre.com/categories/'
 
     # Configura los parámetros de la línea de comandos
     parser = argparse.ArgumentParser()
@@ -44,10 +50,13 @@ if __name__ == "__main__":
     for _, values in parser.parse_args()._get_kwargs():
         if values is not None:
             # Por cada user_id ingresado en la línea de comandos
-            # geneara un log con los datos solicitados
+            # genera un log con los datos solicitados
             for value in values:
-                with open(('user_id_' + str(value) + '.log'), 'w') as log:
+                with open(('user_id_' + str(value) + '.log'), 'w+') as log:
                     # Recorre los items de la consulta
                     for item in consulta(str(value)):
-                        log.writelines(item["body"]["id"] + ' ' + item["body"]["title"] + ' ' + item["body"]["category_id"] + ' ' + item["body"]["name"])
+                        # Obtiene el json con los datos de la categoría
+                        cat = consulta(item["body"]["category_id"], False)
+                        
+                        log.writelines(item["body"]["id"] + ' ' + item["body"]["title"] + ' ' + item["body"]["category_id"] + ' ' + cat["name"] + ' ' + item["body"]["paging"]["total"])
                     log.close()
